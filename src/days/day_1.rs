@@ -103,4 +103,11 @@ mod tests {
         let sample_data = String::from("1");
         assert_eq!(exec(&sample_data, 2), 11)
     }
+
+    #[test]
+    #[should_panic]
+    fn test_incorrect_part_panics() {
+        let sample_data = String::from("blah");
+        exec(&sample_data,3);
+    }
 }
