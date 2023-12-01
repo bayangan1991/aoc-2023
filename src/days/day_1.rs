@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 
 fn parse_digit(item: &str, digit_map: &HashMap<&str, &str>) -> String {
-    if digit_map.contains_key(item)
-    {
+    if digit_map.contains_key(item) {
         String::from(*digit_map.get(item).unwrap())
     } else {
         String::from(item)
@@ -40,32 +39,32 @@ fn parse_line(line: &str, to_find: &Vec<&str>, digit_map: &HashMap<&str, &str>) 
     format!("{}{}", min_digit, max_digit).parse().unwrap()
 }
 
-pub fn exec(source: &String, part: i32) -> i32 {
+pub fn exec(source: &str, part: i32) -> i32 {
     let lines = source.split('\n');
 
-    let digit_map: HashMap<&str, &str> = HashMap::from(
-        [
-            ("one", "1"),
-            ("two", "2"),
-            ("three", "3"),
-            ("four", "4"),
-            ("five", "5"),
-            ("six", "6"),
-            ("seven", "7"),
-            ("eight", "8"),
-            ("nine", "9"),
-        ],
-    );
+    let digit_map: HashMap<&str, &str> = HashMap::from([
+        ("one", "1"),
+        ("two", "2"),
+        ("three", "3"),
+        ("four", "4"),
+        ("five", "5"),
+        ("six", "6"),
+        ("seven", "7"),
+        ("eight", "8"),
+        ("nine", "9"),
+    ]);
 
     let values = digit_map.values().cloned().collect::<Vec<&str>>();
 
     let to_find = match part {
-        1 => { values }
-        2 => { [values, digit_map.keys().cloned().collect::<Vec<&str>>()].concat() }
-        _ => panic!("Polly shouldn't be")
+        1 => values,
+        2 => [values, digit_map.keys().cloned().collect::<Vec<&str>>()].concat(),
+        _ => panic!("Polly shouldn't be"),
     };
 
-    lines.map(|line| parse_line(line, &to_find, &digit_map)).sum()
+    lines
+        .map(|line| parse_line(line, &to_find, &digit_map))
+        .sum()
 }
 
 #[cfg(test)]
@@ -108,6 +107,6 @@ mod tests {
     #[should_panic]
     fn test_incorrect_part_panics() {
         let sample_data = String::from("blah");
-        exec(&sample_data,3);
+        exec(&sample_data, 3);
     }
 }
