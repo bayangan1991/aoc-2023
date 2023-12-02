@@ -30,6 +30,11 @@ impl Game {
 
         Match { red, green, blue }
     }
+
+    fn is_valid(&self) -> bool {
+        let stones = self.max_stones();
+        return stones.red <= 12 && stones.green <= 13 && stones.blue <= 14;
+    }
 }
 
 fn parse_line(line: &str) -> Game {
@@ -62,26 +67,11 @@ fn parse_line(line: &str) -> Game {
     game
 }
 
-fn game_is_valid(game: &Game, red: i32, green: i32, blue: i32) -> bool {
-    game.matches.iter().all(|m| {
-        m.red <= red
-            && m.green <= green
-            && m.blue <= blue
-            && m.red + m.green + m.blue <= red + green + blue
-    })
-}
-
 pub fn exec(source: &String, part: i32) -> i32 {
     let games = source.split("\n").map(|line| parse_line(line));
     match part {
         1 => games
-            .map(|game| {
-                if game_is_valid(&game, 12, 13, 14) {
-                    game.id
-                } else {
-                    0
-                }
-            })
+            .map(|game| if game.is_valid() { game.id } else { 0 })
             .sum(),
         2 => games.map(|game| game.max_stones().power()).sum(),
         _ => panic!("Uhh uh uh"),
