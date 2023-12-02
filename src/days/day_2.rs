@@ -19,9 +19,7 @@ impl Match {
 
 impl Game {
     fn max_stones(&self) -> Match {
-        let mut red = 0;
-        let mut green = 0;
-        let mut blue = 0;
+        let (mut red, mut green, mut blue) = (0, 0, 0);
         for m in &self.matches {
             red = if m.red > red { m.red } else { red };
             green = if m.green > green { m.green } else { green };
