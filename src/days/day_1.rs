@@ -18,20 +18,18 @@ fn parse_line(line: &str, to_find: &Vec<&str>, digit_map: &HashMap<&str, &str>) 
         match line.find(test) {
             None => {}
             Some(index) => {
-                let digit = parse_digit(&test, &digit_map);
                 if index < min_index {
                     min_index = index;
-                    min_digit = digit.clone();
+                    min_digit = parse_digit(&test, &digit_map);
                 }
             }
         };
         match line.rfind(test) {
             None => {}
             Some(index) => {
-                let digit = parse_digit(&test, &digit_map);
                 if index >= max_index {
                     max_index = index;
-                    max_digit = digit.clone();
+                    max_digit = parse_digit(&test, &digit_map);
                 }
             }
         }
