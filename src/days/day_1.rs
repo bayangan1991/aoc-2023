@@ -67,9 +67,17 @@ pub fn exec(source: &str, part: i32) -> i32 {
 
 #[cfg(test)]
 mod tests {
+    use std::panic::catch_unwind;
+
     use crate::utils::read_input;
 
     use super::*;
+
+    #[test]
+    fn test_bad_part() {
+        let result = catch_unwind(|| exec(&String::from("test"), 3));
+        assert!(result.is_err());
+    }
 
     #[test]
     fn test_sample_data_1() {
@@ -99,12 +107,5 @@ mod tests {
     fn test_line_parse_3() {
         let sample_data = String::from("1");
         assert_eq!(exec(&sample_data, 2), 11)
-    }
-
-    #[test]
-    #[should_panic]
-    fn test_incorrect_part_panics() {
-        let sample_data = String::from("blah");
-        exec(&sample_data, 3);
     }
 }

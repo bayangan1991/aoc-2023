@@ -91,8 +91,15 @@ pub fn exec(source: &String, part: i32) -> i32 {
 #[cfg(test)]
 mod tests {
     use crate::utils::read_input;
+    use std::panic::catch_unwind;
 
     use super::*;
+
+    #[test]
+    fn test_bad_part() {
+        let result = catch_unwind(|| exec(&String::from("test"), 3));
+        assert!(result.is_err());
+    }
 
     #[test]
     fn test_part_1_with_sample() {
@@ -103,6 +110,12 @@ mod tests {
     fn test_part_2_with_sample() {
         let sample_data = read_input("2_sample_1");
         assert_eq!(exec(&sample_data, 2), 2286)
+    }
+
+    #[test]
+    fn test_bad_colour() {
+        let result = catch_unwind(|| parse_line("Game 1: 3 purple"));
+        assert!(result.is_err());
     }
 
     #[test]

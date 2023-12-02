@@ -10,3 +10,13 @@ fn main() {
     println!("Day 2, Part 1: {}", days::day_2::exec(&day_2, 1));
     println!("Day 2, Part 2: {}", days::day_2::exec(&day_2, 2));
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn run_main() {
+        main();
+    }
+}
