@@ -39,21 +39,15 @@ impl Game {
 
 fn parse_line(line: &str) -> Game {
     let (left, right) = line.split_once(": ").unwrap();
-
-    let game_id = left[5..].parse::<i32>().unwrap();
-
-    let mut game = Game {
-        id: game_id,
-        matches: vec![],
-    };
+    let id = left[5..].parse::<i32>().unwrap();
+    let mut matches = vec![];
 
     for result in right.split("; ") {
-        let mut red = 0;
-        let mut green = 0;
-        let mut blue = 0;
+        let (mut red, mut green, mut blue) = (0, 0, 0);
+
         for pull in result.split(", ") {
-            let (num_str, colour) = pull.split_once(" ").unwrap();
-            let num = num_str.parse::<i32>().unwrap();
+            let (num, colour) = pull.split_once(" ").unwrap();
+            let num = num.parse::<i32>().unwrap();
             match colour {
                 "red" => red += num,
                 "green" => green += num,
@@ -61,10 +55,10 @@ fn parse_line(line: &str) -> Game {
                 _ => panic!("Whoops"),
             }
         }
-        game.matches.push(Match { red, green, blue })
+        matches.push(Match { red, green, blue })
     }
 
-    game
+    Game { id, matches }
 }
 
 pub fn exec(source: &String, part: i32) -> i32 {
@@ -118,17 +112,17 @@ mod tests {
                     Match {
                         red: 4,
                         green: 0,
-                        blue: 3
+                        blue: 3,
                     },
                     Match {
                         red: 1,
                         green: 2,
-                        blue: 6
+                        blue: 6,
                     },
                     Match {
                         red: 0,
                         green: 2,
-                        blue: 0
+                        blue: 0,
                     },
                 ]
             }
