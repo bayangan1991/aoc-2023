@@ -113,60 +113,55 @@ fn get_parts_and_points(source: &str) -> (Vec<Point>, Vec<Part>) {
 #[cfg(test)]
 mod tests {
     use crate::utils::read_input;
+    use std::panic::catch_unwind;
 
     use super::*;
 
     #[test]
+    fn test_bad_part() {
+        let result = catch_unwind(|| exec(&String::from("test"), 3));
+        assert!(result.is_err());
+    }
+
+    #[test]
     fn test_parse_line() {
-        assert_eq!(
-            parse_line("123..*", 0),
-            (
-                vec![Point(5, 0, true)],
-                vec![Part {
-                    number: String::from("123"),
-                    coord: Point(0, 0, false),
-                }]
-            )
-        )
+        let parts = vec![Part {
+            number: String::from("123"),
+            coord: Point(0, 0, false),
+        }];
+        assert_eq!(parse_line("123..*", 0), (vec![Point(5, 0, true)], parts));
     }
 
     #[test]
     fn test_parse_line_2() {
-        assert_eq!(
-            parse_line("123..456", 0),
-            (
-                vec![],
-                vec![
-                    Part {
-                        number: String::from("123"),
-                        coord: Point(0, 0, false),
-                    },
-                    Part {
-                        number: String::from("456"),
-                        coord: Point(5, 0, false),
-                    },
-                ]
-            )
-        );
+        let parts = vec![
+            Part {
+                number: String::from("123"),
+                coord: Point(0, 0, false),
+            },
+            Part {
+                number: String::from("456"),
+                coord: Point(5, 0, false),
+            },
+        ];
+        assert_eq!(parse_line("123..456", 0), (vec![], parts));
     }
 
     #[test]
     fn test_parse_lines() {
+        let parts = vec![
+            Part {
+                number: String::from("123"),
+                coord: Point(0, 0, false),
+            },
+            Part {
+                number: String::from("456"),
+                coord: Point(1, 1, false),
+            },
+        ];
         assert_eq!(
             get_parts_and_points("123...*\n.456.#."),
-            (
-                vec![Point(6, 0, true), Point(5, 1, false)],
-                vec![
-                    Part {
-                        number: String::from("123"),
-                        coord: Point(0, 0, false),
-                    },
-                    Part {
-                        number: String::from("456"),
-                        coord: Point(1, 1, false),
-                    },
-                ]
-            )
+            (vec![Point(6, 0, true), Point(5, 1, false)], parts)
         )
     }
 
