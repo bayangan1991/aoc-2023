@@ -12,7 +12,7 @@ fn main() {
 
     let day_3 = utils::read_input("3");
     println!("Day 3, Part 1: {}", days::day_3::exec(&day_3, 1));
-    //println!("Day 2, Part 2: {}", days::day_3::exec(&day_3, 2));
+    println!("Day 3, Part 2: {}", days::day_3::exec(&day_3, 2));
 }
 
 #[cfg(test)]
