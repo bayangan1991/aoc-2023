@@ -1,18 +1,21 @@
 use std::collections::HashMap;
 
-fn parse_digit(item: &str, digit_map: &HashMap<&str, &str>) -> String {
+fn parse_digit(item: &str, digit_map: &HashMap<&str, &str>) -> char {
     if digit_map.contains_key(item) {
-        String::from(*digit_map.get(item).unwrap())
+        *digit_map.get(item).unwrap()
     } else {
-        String::from(item)
+        item
     }
+    .chars()
+    .next()
+    .unwrap()
 }
 
 fn parse_line(line: &str, to_find: &Vec<&str>, digit_map: &HashMap<&str, &str>) -> i32 {
     let mut min_index = 999;
     let mut max_index = 0;
-    let mut min_digit = String::new();
-    let mut max_digit = String::new();
+    let mut min_digit = '0';
+    let mut max_digit = '0';
 
     for test in to_find {
         match line.find(test) {
