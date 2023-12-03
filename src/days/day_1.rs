@@ -23,7 +23,7 @@ fn parse_line(line: &str, to_find: &Vec<&str>, digit_map: &HashMap<&str, &str>) 
             Some(index) => {
                 if index < min_index {
                     min_index = index;
-                    min_digit = parse_digit(&test, &digit_map);
+                    min_digit = parse_digit(test, digit_map);
                 }
             }
         };
@@ -32,7 +32,7 @@ fn parse_line(line: &str, to_find: &Vec<&str>, digit_map: &HashMap<&str, &str>) 
             Some(index) => {
                 if index >= max_index {
                     max_index = index;
-                    max_digit = parse_digit(&test, &digit_map);
+                    max_digit = parse_digit(test, digit_map);
                 }
             }
         }
