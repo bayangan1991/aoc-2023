@@ -43,7 +43,7 @@ fn parse_line(line: &str, to_find: &Vec<&str>, digit_map: &HashMap<&str, &str>) 
 pub fn exec(source: &str, part: i32) -> i32 {
     let lines = source.split('\n');
 
-    let digit_map: HashMap<&str, &str> = HashMap::from([
+    let digit_map = HashMap::from([
         ("one", "1"),
         ("two", "2"),
         ("three", "3"),
@@ -55,11 +55,11 @@ pub fn exec(source: &str, part: i32) -> i32 {
         ("nine", "9"),
     ]);
 
-    let values = digit_map.values().cloned().collect::<Vec<&str>>();
+    let values = digit_map.values().cloned().collect();
 
     let to_find = match part {
         1 => values,
-        2 => [values, digit_map.keys().cloned().collect::<Vec<&str>>()].concat(),
+        2 => [values, digit_map.keys().cloned().collect()].concat(),
         _ => panic!("Polly shouldn't be"),
     };
 

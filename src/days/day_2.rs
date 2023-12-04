@@ -37,7 +37,7 @@ impl Game {
 
 fn parse_line(line: &str) -> Game {
     let (left, right) = line.split_once(": ").unwrap();
-    let id = left[5..].parse::<i32>().unwrap();
+    let id = left[5..].parse().unwrap();
     let mut matches = vec![];
 
     for result in right.split("; ") {
