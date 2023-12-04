@@ -29,12 +29,15 @@ fn calc_part_2(points: &Vec<Point>, parts: &Vec<Part>) -> i32 {
             continue;
         }
 
-        let parts_in_range = parts.iter().filter(|part| part.in_range(point)).count();
+        let filtered_parts = parts
+            .iter()
+            .filter(|part| part.in_range(point))
+            .collect::<Vec<_>>();
+        let parts_in_range = filtered_parts.iter().count();
 
         if parts_in_range == 2 {
-            result += parts
+            result += filtered_parts
                 .iter()
-                .filter(|part| part.in_range(point))
                 .map(|part| part.value())
                 .product::<i32>();
         }
@@ -63,27 +66,27 @@ pub fn exec(source: &String, part: i32) -> i32 {
 }
 
 fn parse_line(line: &str, line_index: i32) -> (Vec<Point>, Vec<Part>) {
-    let mut parts = vec![];
-    let mut points = vec![];
+    let mut parts = Vec::with_capacity(20);
+    let mut points = Vec::with_capacity(20);
     let mut current_part = Part {
-        number: String::new(),
+        number: String::with_capacity(3),
         coord: Point(-1, line_index, false),
     };
 
     for (index, char) in line.chars().enumerate() {
-        if char.is_numeric() {
+        if char.is_ascii_digit() {
             current_part.number.push(char);
             if current_part.coord.0 == -1 {
                 current_part.coord = Point(index as i32, line_index, false);
             }
-        } else if !char.is_ascii_digit() {
+        } else {
             if char != '.' {
                 points.push(Point(index as i32, line_index, char == '*'));
             }
             if current_part.coord.0 != -1 {
                 parts.push(current_part.clone());
                 current_part = Part {
-                    number: String::new(),
+                    number: String::with_capacity(3),
                     coord: Point(-1, line_index, false),
                 };
             }
@@ -98,8 +101,8 @@ fn parse_line(line: &str, line_index: i32) -> (Vec<Point>, Vec<Part>) {
 }
 
 fn get_parts_and_points(source: &str) -> (Vec<Point>, Vec<Part>) {
-    let mut points = vec![];
-    let mut parts = vec![];
+    let mut points = Vec::with_capacity(1200);
+    let mut parts = Vec::with_capacity(1200);
 
     for (line_index, line) in source.split('\n').enumerate() {
         let (new_points, new_parts) = parse_line(line, line_index as i32);
@@ -112,8 +115,9 @@ fn get_parts_and_points(source: &str) -> (Vec<Point>, Vec<Part>) {
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::read_input;
     use std::panic::catch_unwind;
+
+    use crate::utils::read_input;
 
     use super::*;
 
