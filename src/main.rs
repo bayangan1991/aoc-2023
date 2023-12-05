@@ -18,8 +18,9 @@ fn main() {
     println!("Day 3, Part 2: {}\n", day_3.1);
 
     let day_4 = utils::read_input("4");
-    println!("Day 4, Part 1: {}", days::day_4::exec(&day_4, 1));
-    println!("Day 4, Part 2: {}\n", days::day_4::exec(&day_4, 2));
+    let day_2 = days::day_4::exec(&day_4);
+    println!("Day 4, Part 1: {}", day_2.0);
+    println!("Day 4, Part 2: {}\n", day_2.1);
 }
 
 #[cfg(test)]

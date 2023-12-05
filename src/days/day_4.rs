@@ -6,17 +6,17 @@ struct Card {
     matches: u32,
 }
 
-pub fn exec(source: &str, part: u32) -> u32 {
+pub fn exec(source: &str) -> (u32, u32) {
     let cards: Vec<_> = source
         .split('\n')
         .enumerate()
         .map(|(index, line)| parse_line(index as u32 + 1, line))
         .collect();
-    match part {
-        1 => cards.iter().map(|card| calc_score(&card)).sum(),
-        2 => calc_part_2(&cards),
-        _ => panic!("Polly shouldn't be"),
-    }
+
+    (
+        cards.iter().map(|card| calc_score(&card)).sum(),
+        calc_part_2(&cards),
+    )
 }
 
 fn parse_line(id: u32, line: &str) -> Card {
@@ -82,13 +82,6 @@ fn calc_part_2(cards: &Vec<Card>) -> u32 {
 mod tests {
     use super::*;
     use crate::utils::read_input;
-    use std::panic::catch_unwind;
-
-    #[test]
-    fn test_bad_part() {
-        let result = catch_unwind(|| exec(&String::from("test"), 3));
-        assert!(result.is_err());
-    }
 
     #[test]
     fn test_parse_line() {
@@ -102,7 +95,7 @@ mod tests {
         let sample = "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53";
         let result = parse_line(1, sample);
         assert_eq!(result.matches, 4);
-        assert_eq!(exec(sample, 1), 8);
+        assert_eq!(exec(sample).0, 8);
     }
 
     #[test]
@@ -118,13 +111,13 @@ mod tests {
     #[test]
     fn test_sample_data_1() {
         let sample_data = read_input("4_sample_1");
-        assert_eq!(exec(&sample_data, 1), 13);
+        assert_eq!(exec(&sample_data).0, 13);
     }
 
     #[test]
     fn test_sample_data_2() {
         let sample_data = read_input("4_sample_1");
-        assert_eq!(exec(&sample_data, 2), 30);
+        assert_eq!(exec(&sample_data).1, 30);
     }
 
     #[test]
