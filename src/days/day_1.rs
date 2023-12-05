@@ -40,8 +40,8 @@ fn parse_line(line: &str, to_find: &Vec<&str>, digit_map: &HashMap<&str, &str>) 
     format!("{}{}", min_digit, max_digit).parse().unwrap()
 }
 
-pub fn exec(source: &str, part: i32) -> i32 {
-    let lines = source.split('\n');
+pub fn exec(source: &str) -> (i32, i32) {
+    let lines = source.split('\n').collect::<Vec<_>>();
 
     let digit_map = HashMap::from([
         ("one", "1"),
@@ -55,60 +55,55 @@ pub fn exec(source: &str, part: i32) -> i32 {
         ("nine", "9"),
     ]);
 
-    let values = digit_map.values().cloned().collect();
+    let values: Vec<_> = digit_map.values().cloned().collect();
+    let values_2 = [values.clone(), digit_map.keys().cloned().collect()].concat();
 
-    let to_find = match part {
-        1 => values,
-        2 => [values, digit_map.keys().cloned().collect()].concat(),
-        _ => panic!("Polly shouldn't be"),
-    };
+    let (part_1, part_2) = lines
+        .iter()
+        .map(|line| {
+            (
+                parse_line(line, &values, &digit_map),
+                parse_line(line, &values_2, &digit_map),
+            )
+        })
+        .unzip::<i32, i32, Vec<_>, Vec<_>>();
 
-    lines
-        .map(|line| parse_line(line, &to_find, &digit_map))
-        .sum()
+    (part_1.iter().sum(), part_2.iter().sum())
 }
 
 #[cfg(test)]
 mod tests {
-    use std::panic::catch_unwind;
-
     use crate::utils::read_input;
 
     use super::*;
 
     #[test]
-    fn test_bad_part() {
-        let result = catch_unwind(|| exec(&String::from("test"), 3));
-        assert!(result.is_err());
-    }
-
-    #[test]
     fn test_sample_data_1() {
         let sample_data = read_input("1_sample_1");
-        assert_eq!(exec(&sample_data, 1), 142);
+        assert_eq!(exec(&sample_data), (142, 142));
     }
 
     #[test]
     fn test_sample_data_2() {
         let sample_data = read_input("1_sample_2");
-        assert_eq!(exec(&sample_data, 2), 281);
+        assert_eq!(exec(&sample_data), (209, 281));
     }
 
     #[test]
     fn test_line_parse_1() {
         let sample_data = String::from("eightone7threenl7mtxbmkpkzqzljrdk");
-        assert_eq!(exec(&sample_data, 2), 87)
+        assert_eq!(exec(&sample_data), (77, 87))
     }
 
     #[test]
     fn test_line_parse_2() {
         let sample_data = String::from("hzgrkrbmjmzhpfkfgg5");
-        assert_eq!(exec(&sample_data, 2), 55)
+        assert_eq!(exec(&sample_data), (55, 55))
     }
 
     #[test]
     fn test_line_parse_3() {
         let sample_data = String::from("1");
-        assert_eq!(exec(&sample_data, 2), 11)
+        assert_eq!(exec(&sample_data), (11, 11))
     }
 }
