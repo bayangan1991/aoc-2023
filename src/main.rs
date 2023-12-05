@@ -8,8 +8,9 @@ fn main() {
     println!("Day 1, Part 2: {}\n", day_1.1);
 
     let day_2 = utils::read_input("2");
-    println!("Day 2, Part 1: {}", days::day_2::exec(&day_2, 1));
-    println!("Day 2, Part 2: {}\n", days::day_2::exec(&day_2, 2));
+    let day_2 = days::day_2::exec(&day_2);
+    println!("Day 2, Part 1: {}", day_2.0);
+    println!("Day 2, Part 2: {}\n", day_2.1);
 
     let day_3 = utils::read_input("3");
     println!("Day 3, Part 1: {}", days::day_3::exec(&day_3, 1));

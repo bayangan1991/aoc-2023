@@ -59,15 +59,23 @@ fn parse_line(line: &str) -> Game {
     Game { id, matches }
 }
 
-pub fn exec(source: &String, part: i32) -> i32 {
-    let games = source.split("\n").map(|line| parse_line(line));
-    match part {
-        1 => games
-            .map(|game| if game.is_valid() { game.id } else { 0 })
-            .sum(),
-        2 => games.map(|game| game.max_stones().power()).sum(),
-        _ => panic!("Uhh uh uh"),
-    }
+pub fn exec(source: &String) -> (i32, i32) {
+    let games = source
+        .split("\n")
+        .map(|line| parse_line(line))
+        .collect::<Vec<_>>();
+
+    let (part_1, part_2) = games
+        .iter()
+        .map(|game| {
+            (
+                if game.is_valid() { game.id } else { 0 },
+                game.max_stones().power(),
+            )
+        })
+        .unzip::<i32, i32, Vec<_>, Vec<_>>();
+
+    (part_1.iter().sum(), part_2.iter().sum())
 }
 
 #[cfg(test)]
@@ -78,20 +86,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_bad_part() {
-        let result = catch_unwind(|| exec(&String::from("test"), 3));
-        assert!(result.is_err());
-    }
-
-    #[test]
     fn test_part_1_with_sample() {
         let sample_data = read_input("2_sample_1");
-        assert_eq!(exec(&sample_data, 1), 8)
-    }
-    #[test]
-    fn test_part_2_with_sample() {
-        let sample_data = read_input("2_sample_1");
-        assert_eq!(exec(&sample_data, 2), 2286)
+        assert_eq!(exec(&sample_data), (8, 2286))
     }
 
     #[test]
