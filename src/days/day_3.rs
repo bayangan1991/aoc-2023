@@ -46,23 +46,18 @@ fn calc_part_2(points: &Vec<Point>, parts: &Vec<Part>) -> i32 {
     result
 }
 
-pub fn exec(source: &String, part: i32) -> i32 {
+pub fn exec(source: &String) -> (i32, i32) {
     let (points, parts) = get_parts_and_points(source);
 
-    match part {
-        1 => parts
-            .iter()
-            .map(|part| {
-                if points.iter().any(|point| part.in_range(point)) {
-                    part.value()
-                } else {
-                    0
-                }
-            })
-            .sum(),
-        2 => calc_part_2(&points, &parts),
-        _ => panic!("How did we end up here?"),
-    }
+    let part_1 = parts.iter().map(|part| {
+        if points.iter().any(|point| part.in_range(point)) {
+            part.value()
+        } else {
+            0
+        }
+    });
+
+    (part_1.sum(), calc_part_2(&points, &parts))
 }
 
 fn parse_line(line: &str, line_index: i32) -> (Vec<Point>, Vec<Part>) {
@@ -115,17 +110,8 @@ fn get_parts_and_points(source: &str) -> (Vec<Point>, Vec<Part>) {
 
 #[cfg(test)]
 mod tests {
-    use std::panic::catch_unwind;
-
-    use crate::utils::read_input;
-
     use super::*;
-
-    #[test]
-    fn test_bad_part() {
-        let result = catch_unwind(|| exec(&String::from("test"), 3));
-        assert!(result.is_err());
-    }
+    use crate::utils::read_input;
 
     #[test]
     fn test_parse_line() {
@@ -215,23 +201,23 @@ mod tests {
 
     #[test]
     fn test_example_1() {
-        assert_eq!(exec(&String::from("123.*"), 1), 0);
-        assert_eq!(exec(&String::from("123*."), 1), 123);
-        assert_eq!(exec(&String::from("123..\n*...."), 1), 123);
-        assert_eq!(exec(&String::from("123..\n.....\n*...."), 1), 0);
-        assert_eq!(exec(&String::from("123..\n...*.\n....."), 1), 123);
-        assert_eq!(exec(&String::from("123..\n...*.\n..456"), 1), 579);
-        assert_eq!(exec(&String::from("123..\n.*.*.\n..456"), 1), 579);
-        assert_eq!(exec(&String::from("123..\n....*\n..456"), 1), 456);
-        assert_eq!(exec(&String::from("111\n*$*\n1.1"), 1), 113);
-        assert_eq!(exec(&String::from("111\n*..\n1.1"), 1), 112);
-        assert_eq!(exec(&String::from("111\n...\n1*1"), 1), 2);
+        assert_eq!(exec(&String::from("123.*")).0, 0);
+        assert_eq!(exec(&String::from("123*.")).0, 123);
+        assert_eq!(exec(&String::from("123..\n*....")).0, 123);
+        assert_eq!(exec(&String::from("123..\n.....\n*....")).0, 0);
+        assert_eq!(exec(&String::from("123..\n...*.\n.....")).0, 123);
+        assert_eq!(exec(&String::from("123..\n...*.\n..456")).0, 579);
+        assert_eq!(exec(&String::from("123..\n.*.*.\n..456")).0, 579);
+        assert_eq!(exec(&String::from("123..\n....*\n..456")).0, 456);
+        assert_eq!(exec(&String::from("111\n*$*\n1.1")).0, 113);
+        assert_eq!(exec(&String::from("111\n*..\n1.1")).0, 112);
+        assert_eq!(exec(&String::from("111\n...\n1*1")).0, 2);
     }
 
     #[test]
     fn test_sample_data() {
         let sample_data = read_input("3_sample_1");
-        assert_eq!(exec(&sample_data, 1), 4361);
+        assert_eq!(exec(&sample_data).0, 4361);
     }
 
     #[test]
@@ -241,7 +227,7 @@ mod tests {
 
         let first_3_lines = &sample_data[..3].join("\n");
 
-        assert_eq!(exec(&first_3_lines, 1), 8264);
+        assert_eq!(exec(&first_3_lines).0, 8264);
     }
 
     #[test]
@@ -276,6 +262,6 @@ mod tests {
     #[test]
     fn test_sample_part_2() {
         let data = read_input("3_sample_1");
-        assert_eq!(exec(&data, 2), 467835)
+        assert_eq!(exec(&data).1, 467835)
     }
 }
