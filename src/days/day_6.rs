@@ -11,14 +11,27 @@ pub fn exec(_source: &str) -> (usize, usize) {
 }
 
 fn evaluate_options(time: usize, distance: usize) -> usize {
-    let mut result = 0;
+    let mut start = 0;
+    let mut end = 0;
     for x in 0..time {
         if (time - x) * x > distance {
-            result += 1
+            start = x;
+            break;
         }
     }
 
-    result
+    for x in (0..time).rev() {
+        if (time - x) * x > distance {
+            end = x;
+            break;
+        }
+    }
+
+    if end != 0 {
+        end - start + 1
+    } else {
+        time - start
+    }
 }
 
 #[cfg(test)]
