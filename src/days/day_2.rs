@@ -59,7 +59,7 @@ fn parse_line(line: &str) -> Game {
     Game { id, matches }
 }
 
-pub fn exec(source: &String) -> (i32, i32) {
+pub fn exec(source: &str) -> (i32, i32) {
     let games = source
         .split("\n")
         .map(|line| parse_line(line))
@@ -80,8 +80,9 @@ pub fn exec(source: &String) -> (i32, i32) {
 
 #[cfg(test)]
 mod tests {
-    use crate::utils::read_input;
     use std::panic::catch_unwind;
+
+    use crate::utils::read_input;
 
     use super::*;
 
@@ -119,7 +120,7 @@ mod tests {
                         green: 2,
                         blue: 0,
                     },
-                ]
+                ],
             }
         );
     }

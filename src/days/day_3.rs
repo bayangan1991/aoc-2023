@@ -46,7 +46,7 @@ fn calc_part_2(points: &Vec<Point>, parts: &Vec<Part>) -> i32 {
     result
 }
 
-pub fn exec(source: &String) -> (i32, i32) {
+pub fn exec(source: &str) -> (i32, i32) {
     let (points, parts) = get_parts_and_points(source);
 
     let part_1 = parts.iter().map(|part| {
