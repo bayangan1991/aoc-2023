@@ -2,15 +2,12 @@ const INPUT_1: [(usize, usize); 4] = [(54, 239), (70, 1142), (82, 1295), (75, 12
 
 pub fn exec(_source: &str) -> (usize, usize) {
     (
-        INPUT_1
-            .iter()
-            .map(|(t, d)| evaluate_options(*t, *d))
-            .product(),
-        evaluate_options(54708275, 239114212951253),
+        INPUT_1.iter().map(|(t, d)| math_solve(*t, *d)).product(),
+        math_solve(54708275, 239114212951253),
     )
 }
 
-fn evaluate_options(time: usize, distance: usize) -> usize {
+/*fn evaluate_options(time: usize, distance: usize) -> usize {
     let mut start = 0;
     let mut end = 0;
     for x in 0..time {
@@ -32,6 +29,15 @@ fn evaluate_options(time: usize, distance: usize) -> usize {
     } else {
         time - start
     }
+}*/
+
+fn math_solve(time: usize, distance: usize) -> usize {
+    let d = f64::sqrt((time * time - 4 * distance) as f64);
+
+    let from = f64::floor((time as f64 - d) / 2_f64);
+    let to = f64::ceil((time as f64 + d) / 2_f64);
+
+    (to - from) as usize - 1
 }
 
 #[cfg(test)]
@@ -40,8 +46,8 @@ mod tests {
 
     #[test]
     fn test_evaluate_options() {
-        assert_eq!(evaluate_options(7, 9), 4);
-        assert_eq!(evaluate_options(15, 40), 8);
-        assert_eq!(evaluate_options(30, 200), 9);
+        assert_eq!(math_solve(7, 9), 4);
+        assert_eq!(math_solve(15, 40), 8);
+        assert_eq!(math_solve(30, 200), 9);
     }
 }
