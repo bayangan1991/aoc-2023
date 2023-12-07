@@ -8,7 +8,7 @@ pub fn exec(source: &str) -> (usize, usize) {
 
     let mut hands = source
         .split('\n')
-        .map(|line| parse_line(line, &hand_lookup, GameMode::Standard))
+        .map(|line| parse_line(line, &hand_lookup))
         .collect::<Vec<_>>();
 
     hands.sort_by(sort_cards);
@@ -17,25 +17,24 @@ pub fn exec(source: &str) -> (usize, usize) {
         .iter()
         .enumerate()
         .map(|(rank, hand)| hand.bet * (rank + 1))
-        .collect::<Vec<_>>();
+        .sum();
 
-    let mut hands_2 = source
-        .split('\n')
-        .map(|line| parse_line(line, &hand_lookup, GameMode::Joker))
-        .collect::<Vec<_>>();
+    hands
+        .iter_mut()
+        .for_each(|hand| hand.mode = GameMode::Joker);
 
-    hands_2.sort_by(sort_cards);
+    hands.sort_by(sort_cards);
 
-    let part_2 = hands_2
+    let part_2 = hands
         .iter()
         .enumerate()
         .map(|(rank, hand)| hand.bet * (rank + 1))
-        .collect::<Vec<_>>();
+        .sum();
 
-    (part_1.iter().sum(), part_2.iter().sum())
+    (part_1, part_2)
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Debug)]
 enum GameMode {
     Standard,
     Joker,
@@ -43,17 +42,33 @@ enum GameMode {
 
 #[derive(PartialEq, Debug)]
 struct Hand {
+    mode: GameMode,
     cards: [usize; 5],
     bet: usize,
 }
 
 impl Hand {
+    fn cards(&self) -> [usize; 5] {
+        self.cards
+            .iter()
+            .map(|card| {
+                card - if *card == 11 && self.mode == GameMode::Joker {
+                    10
+                } else {
+                    0
+                }
+            })
+            .collect::<Vec<_>>()
+            .try_into()
+            .unwrap()
+    }
+
     fn hand_rank(&self) -> usize {
         let mut counts = (1..=14)
-            .map(|i| (self.cards.iter().filter(|j| **j == i).count(), i))
+            .map(|i| (self.cards().iter().filter(|j| **j == i).count(), i))
             .collect::<Vec<(usize, usize)>>();
 
-        let joker_count = self.cards.iter().filter(|j| **j == 1).count();
+        let joker_count = self.cards().iter().filter(|j| **j == 1).count();
 
         counts.sort();
         counts.reverse();
@@ -97,7 +112,7 @@ fn sort_cards(a: &Hand, b: &Hand) -> Ordering {
     }
 }
 
-fn parse_line(line: &str, hand_lookup: &HashMap<char, usize>, mode: GameMode) -> Hand {
+fn parse_line(line: &str, hand_lookup: &HashMap<char, usize>) -> Hand {
     let (left, right) = line.split_once(' ').unwrap();
     let bet = right.parse().unwrap();
 
@@ -105,19 +120,17 @@ fn parse_line(line: &str, hand_lookup: &HashMap<char, usize>, mode: GameMode) ->
         .chars()
         .map(|char| match hand_lookup.get(&char) {
             None => char.to_digit(10).unwrap() as usize,
-            Some(value) => {
-                if *value == 11 && mode == GameMode::Joker {
-                    1
-                } else {
-                    *value
-                }
-            }
+            Some(value) => *value,
         })
         .collect::<Vec<_>>()
         .try_into()
         .unwrap();
 
-    Hand { cards, bet }
+    Hand {
+        cards,
+        bet,
+        mode: GameMode::Standard,
+    }
 }
 
 #[cfg(test)]
@@ -135,8 +148,9 @@ mod tests {
     #[test]
     fn test_parse_line() {
         assert_eq!(
-            parse_line("12345 678", &HashMap::from(FACE_VALUE), GameMode::Standard),
+            parse_line("12345 678", &HashMap::from(FACE_VALUE)),
             Hand {
+                mode: GameMode::Standard,
                 cards: [1, 2, 3, 4, 5],
                 bet: 678,
             }
@@ -146,16 +160,10 @@ mod tests {
     #[test]
     fn test_parse_line_with_faces() {
         assert_eq!(
-            parse_line("TJA4K 678", &HashMap::from(FACE_VALUE), GameMode::Standard),
+            parse_line("TJA4K 678", &HashMap::from(FACE_VALUE)),
             Hand {
+                mode: GameMode::Standard,
                 cards: [10, 11, 14, 4, 13],
-                bet: 678,
-            }
-        );
-        assert_eq!(
-            parse_line("TJA4K 678", &HashMap::from(FACE_VALUE), GameMode::Joker),
-            Hand {
-                cards: [10, 1, 14, 4, 13],
                 bet: 678,
             }
         );
@@ -165,6 +173,7 @@ mod tests {
     fn test_hand_ranks() {
         assert_eq!(
             Hand {
+                mode: GameMode::Standard,
                 cards: [2, 2, 2, 2, 2],
                 bet: 1,
             }
@@ -173,6 +182,7 @@ mod tests {
         );
         assert_eq!(
             Hand {
+                mode: GameMode::Standard,
                 cards: [2, 2, 3, 2, 2],
                 bet: 1,
             }
@@ -181,6 +191,7 @@ mod tests {
         );
         assert_eq!(
             Hand {
+                mode: GameMode::Standard,
                 cards: [2, 13, 2, 2, 13],
                 bet: 1,
             }
@@ -189,6 +200,7 @@ mod tests {
         );
         assert_eq!(
             Hand {
+                mode: GameMode::Standard,
                 cards: [2, 2, 2, 13, 10],
                 bet: 1,
             }
@@ -197,6 +209,7 @@ mod tests {
         );
         assert_eq!(
             Hand {
+                mode: GameMode::Standard,
                 cards: [2, 2, 7, 5, 5],
                 bet: 1,
             }
@@ -205,6 +218,7 @@ mod tests {
         );
         assert_eq!(
             Hand {
+                mode: GameMode::Standard,
                 cards: [2, 2, 7, 5, 9],
                 bet: 1,
             }
@@ -213,6 +227,7 @@ mod tests {
         );
         assert_eq!(
             Hand {
+                mode: GameMode::Standard,
                 cards: [2, 10, 7, 5, 9],
                 bet: 1,
             }
@@ -225,30 +240,37 @@ mod tests {
     fn test_sort_hands() {
         let mut hands = vec![
             Hand {
+                mode: GameMode::Standard,
                 cards: [13, 13, 13, 13, 13],
                 bet: 1,
             },
             Hand {
+                mode: GameMode::Standard,
                 cards: [12, 12, 12, 12, 12],
                 bet: 2,
             },
             Hand {
+                mode: GameMode::Standard,
                 cards: [3, 3, 3, 3, 12],
                 bet: 3,
             },
             Hand {
+                mode: GameMode::Standard,
                 cards: [13, 13, 12, 12, 12],
                 bet: 4,
             },
             Hand {
+                mode: GameMode::Standard,
                 cards: [11, 11, 11, 10, 10],
                 bet: 5,
             },
             Hand {
+                mode: GameMode::Standard,
                 cards: [3, 3, 3, 2, 2],
                 bet: 6,
             },
             Hand {
+                mode: GameMode::Standard,
                 cards: [12, 12, 8, 7, 5],
                 bet: 7,
             },
