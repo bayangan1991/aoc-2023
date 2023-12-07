@@ -2,15 +2,13 @@ use std::cmp::Ordering;
 use std::collections::HashMap;
 
 const FACE_VALUE: [(char, usize); 5] = [('A', 14), ('K', 13), ('Q', 12), ('J', 11), ('T', 10)];
-const FACE_VALUE_2: [(char, usize); 5] = [('A', 14), ('K', 13), ('Q', 12), ('J', 1), ('T', 10)];
 
 pub fn exec(source: &str) -> (usize, usize) {
     let hand_lookup = HashMap::from(FACE_VALUE);
-    let hand_lookup_2 = HashMap::from(FACE_VALUE_2);
 
     let mut hands = source
         .split('\n')
-        .map(|line| parse_line(line, &hand_lookup))
+        .map(|line| parse_line(line, &hand_lookup, GameMode::Standard))
         .collect::<Vec<_>>();
 
     hands.sort_by(part_a);
@@ -23,7 +21,7 @@ pub fn exec(source: &str) -> (usize, usize) {
 
     let mut hands_2 = source
         .split('\n')
-        .map(|line| parse_line(line, &hand_lookup_2))
+        .map(|line| parse_line(line, &hand_lookup, GameMode::Joker))
         .collect::<Vec<_>>();
 
     hands_2.sort_by(part_b);
@@ -37,7 +35,13 @@ pub fn exec(source: &str) -> (usize, usize) {
     (part_1.iter().sum(), part_2.iter().sum())
 }
 
-#[derive(PartialEq, Eq, Debug)]
+#[derive(PartialEq)]
+enum GameMode {
+    Standard,
+    Joker,
+}
+
+#[derive(PartialEq, Debug)]
 struct Hand {
     cards: [usize; 5],
     bet: usize,
@@ -132,7 +136,7 @@ fn part_b(a: &Hand, b: &Hand) -> Ordering {
     }
 }
 
-fn parse_line(line: &str, hand_lookup: &HashMap<char, usize>) -> Hand {
+fn parse_line(line: &str, hand_lookup: &HashMap<char, usize>, mode: GameMode) -> Hand {
     let (left, right) = line.split_once(' ').unwrap();
     let bet = right.parse().unwrap();
 
@@ -140,7 +144,13 @@ fn parse_line(line: &str, hand_lookup: &HashMap<char, usize>) -> Hand {
         .chars()
         .map(|char| match hand_lookup.get(&char) {
             None => char.to_digit(10).unwrap() as usize,
-            Some(value) => *value,
+            Some(value) => {
+                if *value == 11 && mode == GameMode::Joker {
+                    1
+                } else {
+                    *value
+                }
+            }
         })
         .collect::<Vec<_>>()
         .try_into()
@@ -164,7 +174,7 @@ mod tests {
     #[test]
     fn test_parse_line() {
         assert_eq!(
-            parse_line("12345 678", &HashMap::from(FACE_VALUE)),
+            parse_line("12345 678", &HashMap::from(FACE_VALUE), GameMode::Standard),
             Hand {
                 cards: [1, 2, 3, 4, 5],
                 bet: 678,
@@ -175,7 +185,7 @@ mod tests {
     #[test]
     fn test_parse_line_with_faces() {
         assert_eq!(
-            parse_line("T2A4K 678", &HashMap::from(FACE_VALUE)),
+            parse_line("T2A4K 678", &HashMap::from(FACE_VALUE), GameMode::Standard),
             Hand {
                 cards: [10, 2, 14, 4, 13],
                 bet: 678,
