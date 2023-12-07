@@ -11,7 +11,7 @@ pub fn exec(source: &str) -> (usize, usize) {
         .map(|line| parse_line(line, &hand_lookup))
         .collect::<Vec<_>>();
 
-    hands.sort_by(sort_cards);
+    hands.sort_by(|a, b| sort_cards(a, b, &GameMode::Standard));
 
     let part_1 = hands
         .iter()
@@ -19,11 +19,7 @@ pub fn exec(source: &str) -> (usize, usize) {
         .map(|(rank, hand)| hand.bet * (rank + 1))
         .sum();
 
-    hands
-        .iter_mut()
-        .for_each(|hand| hand.mode = GameMode::Joker);
-
-    hands.sort_by(sort_cards);
+    hands.sort_by(|a, b| sort_cards(a, b, &GameMode::Joker));
 
     let part_2 = hands
         .iter()
@@ -42,18 +38,17 @@ enum GameMode {
 
 #[derive(PartialEq, Debug)]
 struct Hand {
-    mode: GameMode,
     cards: [usize; 5],
     bet: usize,
 }
 
 impl Hand {
-    fn hand_rank(&self) -> usize {
+    fn hand_rank(&self, mode: &GameMode) -> usize {
         let mut counts = (2..=14)
             .map(|i| (self.cards.iter().filter(|j| **j == i).count(), i))
             .collect::<Vec<(usize, usize)>>();
 
-        if self.mode == GameMode::Joker {
+        if mode == &GameMode::Joker {
             for (_, card) in counts.iter_mut() {
                 if card == &11 {
                     *card -= 10;
@@ -70,7 +65,7 @@ impl Hand {
         let (mut count_1, best_card) = *counts.get(0).unwrap();
         let (mut count_2, next_card) = *counts.get(1).unwrap_or(&(0, 0));
 
-        if self.mode == GameMode::Joker {
+        if mode == &GameMode::Joker {
             if best_card != 1 {
                 count_1 += joker_count;
             } else if next_card != 1 {
@@ -90,8 +85,8 @@ impl Hand {
     }
 }
 
-fn sort_cards(a: &Hand, b: &Hand) -> Ordering {
-    match a.hand_rank().cmp(&b.hand_rank()) {
+fn sort_cards(a: &Hand, b: &Hand, mode: &GameMode) -> Ordering {
+    match a.hand_rank(&mode).cmp(&b.hand_rank(&mode)) {
         Ordering::Less => Ordering::Less,
         Ordering::Greater => Ordering::Greater,
         Ordering::Equal => {
@@ -122,11 +117,7 @@ fn parse_line(line: &str, hand_lookup: &HashMap<char, usize>) -> Hand {
         .try_into()
         .unwrap();
 
-    Hand {
-        cards,
-        bet,
-        mode: GameMode::Standard,
-    }
+    Hand { cards, bet }
 }
 
 #[cfg(test)]
@@ -146,7 +137,6 @@ mod tests {
         assert_eq!(
             parse_line("12345 678", &HashMap::from(FACE_VALUE)),
             Hand {
-                mode: GameMode::Standard,
                 cards: [1, 2, 3, 4, 5],
                 bet: 678,
             }
@@ -158,7 +148,6 @@ mod tests {
         assert_eq!(
             parse_line("TJA4K 678", &HashMap::from(FACE_VALUE)),
             Hand {
-                mode: GameMode::Standard,
                 cards: [10, 11, 14, 4, 13],
                 bet: 678,
             }
@@ -169,65 +158,58 @@ mod tests {
     fn test_hand_ranks() {
         assert_eq!(
             Hand {
-                mode: GameMode::Standard,
                 cards: [2, 2, 2, 2, 2],
                 bet: 1,
             }
-            .hand_rank(),
+            .hand_rank(&GameMode::Standard),
             6
         );
         assert_eq!(
             Hand {
-                mode: GameMode::Standard,
                 cards: [2, 2, 3, 2, 2],
                 bet: 1,
             }
-            .hand_rank(),
+            .hand_rank(&GameMode::Standard),
             5
         );
         assert_eq!(
             Hand {
-                mode: GameMode::Standard,
                 cards: [2, 13, 2, 2, 13],
                 bet: 1,
             }
-            .hand_rank(),
+            .hand_rank(&GameMode::Standard),
             4
         );
         assert_eq!(
             Hand {
-                mode: GameMode::Standard,
                 cards: [2, 2, 2, 13, 10],
                 bet: 1,
             }
-            .hand_rank(),
+            .hand_rank(&GameMode::Standard),
             3
         );
         assert_eq!(
             Hand {
-                mode: GameMode::Standard,
                 cards: [2, 2, 7, 5, 5],
                 bet: 1,
             }
-            .hand_rank(),
+            .hand_rank(&GameMode::Standard),
             2
         );
         assert_eq!(
             Hand {
-                mode: GameMode::Standard,
                 cards: [2, 2, 7, 5, 9],
                 bet: 1,
             }
-            .hand_rank(),
+            .hand_rank(&GameMode::Standard),
             1
         );
         assert_eq!(
             Hand {
-                mode: GameMode::Standard,
                 cards: [2, 10, 7, 5, 9],
                 bet: 1,
             }
-            .hand_rank(),
+            .hand_rank(&GameMode::Standard),
             0
         );
     }
@@ -236,43 +218,36 @@ mod tests {
     fn test_sort_hands() {
         let mut hands = vec![
             Hand {
-                mode: GameMode::Standard,
                 cards: [13, 13, 13, 13, 13],
                 bet: 1,
             },
             Hand {
-                mode: GameMode::Standard,
                 cards: [12, 12, 12, 12, 12],
                 bet: 2,
             },
             Hand {
-                mode: GameMode::Standard,
                 cards: [3, 3, 3, 3, 12],
                 bet: 3,
             },
             Hand {
-                mode: GameMode::Standard,
                 cards: [13, 13, 12, 12, 12],
                 bet: 4,
             },
             Hand {
-                mode: GameMode::Standard,
                 cards: [11, 11, 11, 10, 10],
                 bet: 5,
             },
             Hand {
-                mode: GameMode::Standard,
                 cards: [3, 3, 3, 2, 2],
                 bet: 6,
             },
             Hand {
-                mode: GameMode::Standard,
                 cards: [12, 12, 8, 7, 5],
                 bet: 7,
             },
         ];
 
-        hands.sort_by(sort_cards);
+        hands.sort_by(|a, b| sort_cards(a, b, &GameMode::Standard));
 
         assert_eq!(hands[0].bet, 7);
         assert_eq!(hands[1].bet, 6);
