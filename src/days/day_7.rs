@@ -11,7 +11,7 @@ pub fn exec(source: &str) -> (usize, usize) {
         .map(|line| parse_line(line, &hand_lookup, GameMode::Standard))
         .collect::<Vec<_>>();
 
-    hands.sort_by(part_a);
+    hands.sort_by(sort_cards);
 
     let part_1 = hands
         .iter()
@@ -24,7 +24,7 @@ pub fn exec(source: &str) -> (usize, usize) {
         .map(|line| parse_line(line, &hand_lookup, GameMode::Joker))
         .collect::<Vec<_>>();
 
-    hands_2.sort_by(part_b);
+    hands_2.sort_by(sort_cards);
 
     let part_2 = hands_2
         .iter()
@@ -49,27 +49,6 @@ struct Hand {
 
 impl Hand {
     fn hand_rank(&self) -> usize {
-        let mut counts = (2..=14)
-            .map(|i| (self.cards.iter().filter(|j| **j == i).count(), i))
-            .collect::<Vec<(usize, usize)>>();
-
-        counts.sort();
-        counts.reverse();
-
-        let (count_1, _) = *counts.get(0).unwrap();
-        let (count_2, _) = *counts.get(1).unwrap_or(&(0, 0));
-
-        match (count_1, count_2) {
-            (5, _) => 6,
-            (4, _) => 5,
-            (3, 2) => 4,
-            (3, _) => 3,
-            (2, 2) => 2,
-            (2, _) => 1,
-            _ => 0,
-        }
-    }
-    fn hand_rank_b(&self) -> usize {
         let mut counts = (1..=14)
             .map(|i| (self.cards.iter().filter(|j| **j == i).count(), i))
             .collect::<Vec<(usize, usize)>>();
@@ -100,26 +79,8 @@ impl Hand {
     }
 }
 
-fn part_a(a: &Hand, b: &Hand) -> Ordering {
+fn sort_cards(a: &Hand, b: &Hand) -> Ordering {
     match a.hand_rank().cmp(&b.hand_rank()) {
-        Ordering::Less => Ordering::Less,
-        Ordering::Greater => Ordering::Greater,
-        Ordering::Equal => {
-            let mut ordering = Ordering::Equal;
-            for (index, card) in a.cards.iter().enumerate() {
-                ordering = card.cmp(&b.cards[index]);
-                if ordering == Ordering::Equal {
-                    continue;
-                }
-                break;
-            }
-            ordering
-        }
-    }
-}
-
-fn part_b(a: &Hand, b: &Hand) -> Ordering {
-    match a.hand_rank_b().cmp(&b.hand_rank_b()) {
         Ordering::Less => Ordering::Less,
         Ordering::Greater => Ordering::Greater,
         Ordering::Equal => {
@@ -286,7 +247,7 @@ mod tests {
             },
         ];
 
-        hands.sort_by(part_a);
+        hands.sort_by(sort_cards);
 
         for hand in &hands {
             println!("{}", hand.hand_rank())
