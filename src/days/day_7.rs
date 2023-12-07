@@ -66,7 +66,7 @@ impl Hand {
         }
     }
     fn hand_rank_b(&self) -> usize {
-        let mut counts = (2..=14)
+        let mut counts = (1..=14)
             .map(|i| (self.cards.iter().filter(|j| **j == i).count(), i))
             .collect::<Vec<(usize, usize)>>();
 
