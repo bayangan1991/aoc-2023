@@ -146,9 +146,16 @@ mod tests {
     #[test]
     fn test_parse_line_with_faces() {
         assert_eq!(
-            parse_line("T2A4K 678", &HashMap::from(FACE_VALUE), GameMode::Standard),
+            parse_line("TJA4K 678", &HashMap::from(FACE_VALUE), GameMode::Standard),
             Hand {
-                cards: [10, 2, 14, 4, 13],
+                cards: [10, 11, 14, 4, 13],
+                bet: 678,
+            }
+        );
+        assert_eq!(
+            parse_line("TJA4K 678", &HashMap::from(FACE_VALUE), GameMode::Joker),
+            Hand {
+                cards: [10, 1, 14, 4, 13],
                 bet: 678,
             }
         );
@@ -248,10 +255,6 @@ mod tests {
         ];
 
         hands.sort_by(sort_cards);
-
-        for hand in &hands {
-            println!("{}", hand.hand_rank())
-        }
 
         assert_eq!(hands[0].bet, 7);
         assert_eq!(hands[1].bet, 6);
