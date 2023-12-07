@@ -48,27 +48,21 @@ struct Hand {
 }
 
 impl Hand {
-    fn cards(&self) -> [usize; 5] {
-        self.cards
-            .iter()
-            .map(|card| {
-                card - if *card == 11 && self.mode == GameMode::Joker {
-                    10
-                } else {
-                    0
-                }
-            })
-            .collect::<Vec<_>>()
-            .try_into()
-            .unwrap()
-    }
-
     fn hand_rank(&self) -> usize {
-        let mut counts = (1..=14)
-            .map(|i| (self.cards().iter().filter(|j| **j == i).count(), i))
+        let mut counts = (2..=14)
+            .map(|i| (self.cards.iter().filter(|j| **j == i).count(), i))
             .collect::<Vec<(usize, usize)>>();
 
-        let joker_count = self.cards().iter().filter(|j| **j == 1).count();
+        if self.mode == GameMode::Joker {
+            for (_, card) in counts.iter_mut() {
+                if card == &11 {
+                    *card -= 10;
+                    break;
+                }
+            }
+        }
+
+        let joker_count = self.cards.iter().filter(|j| **j == 11).count();
 
         counts.sort();
         counts.reverse();
@@ -76,10 +70,12 @@ impl Hand {
         let (mut count_1, best_card) = *counts.get(0).unwrap();
         let (mut count_2, next_card) = *counts.get(1).unwrap_or(&(0, 0));
 
-        if best_card != 1 {
-            count_1 += joker_count;
-        } else if next_card != 1 {
-            count_2 += joker_count;
+        if self.mode == GameMode::Joker {
+            if best_card != 1 {
+                count_1 += joker_count;
+            } else if next_card != 1 {
+                count_2 += joker_count;
+            }
         }
 
         match (count_1, count_2) {
