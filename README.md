@@ -17,6 +17,7 @@ Complete Advent of Code 2023 in rust with 100% test coverage.
 | [Day 6](https://adventofcode.com/2023/day/6) | ⭐ | ⭐ |
 | [Day 7](https://adventofcode.com/2023/day/7) | ⭐ | ⭐ |
 | [Day 8](https://adventofcode.com/2023/day/8) | ⭐ | ⭐ |
+| [Day 9](https://adventofcode.com/2023/day/9) | ⭐ | ⭐ |
 <!--- advent_readme_stars table --->
 
 
