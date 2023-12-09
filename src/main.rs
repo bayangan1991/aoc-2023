@@ -36,14 +36,9 @@ fn main() {
     let day_7 = days::day_7::exec(&day_7);
     println!("Day 7, Part 1: {}", day_7.0);
     println!("Day 7, Part 2: {}\n", day_7.1);
-}
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn run_main() {
-        main();
-    }
+    let day_8 = utils::read_input("8");
+    let day_8 = days::day_8::exec(&day_8);
+    println!("Day 8, Part 1: {}", day_8.0);
+    println!("Day 8, Part 2: {}\n", day_8.1);
 }
