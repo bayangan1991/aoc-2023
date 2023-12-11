@@ -70,7 +70,7 @@ fn insert_blanks(
         if blanks.contains(&y) {
             dilate_amount += 1;
         }
-        for (x, space) in line.iter().enumerate() {
+        for (x, _) in line.iter().enumerate() {
             let key = if tranposed { (y, x) } else { (x, y) };
 
             match galaxies.get_mut(&key) {
@@ -153,6 +153,6 @@ mod test {
     #[test]
     fn test_sample() {
         let sample = read_input("11_sample_1");
-        assert_eq!(exec(&sample), (374, 8410));
+        assert_eq!(exec(&sample), (374, 82000210));
     }
 }
