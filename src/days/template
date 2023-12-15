@@ -1,0 +1,15 @@
+pub fn exec(source: &str) -> (usize, usize) {
+    (0, 0)
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::utils::read_input;
+    use super::*;
+
+    #[test]
+    fn test_sample_data_1() {
+        let sample_data = read_input("_sample_1");
+        assert_eq!(exec(&sample_data).0, 0);
+    }
+}
