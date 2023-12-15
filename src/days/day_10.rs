@@ -19,48 +19,51 @@ pub fn exec(source: &str) -> (usize, usize) {
         .map(|&pipe| ((pipe.x, pipe.y), pipe))
         .collect::<HashMap<_, _>>();
 
-    let mut _main_loop: Option<HashSet<Pipe>> = None;
+    let mut main_loop: Option<HashSet<Pipe>> = None;
 
     let part_a = match start {
         None => 0,
         Some(s) => {
             let result = get_max_pipe_distance(&s, &map);
-            _main_loop = Some(result.1);
+            main_loop = Some(result.1);
             result.0
         }
     };
 
-    // let mut max_x = 0;
-    // let mut max_y = 0;
-    // let mut loop_map = HashMap::new();
-    //
-    // for pipe in main_loop.unwrap().iter() {
-    //     max_x = match max_x.cmp(&pipe.x) {
-    //         Ordering::Less => pipe.x,
-    //         _ => max_x,
-    //     };
-    //     max_y = match max_y.cmp(&pipe.y) {
-    //         Ordering::Less => pipe.y,
-    //         _ => max_y,
-    //     };
-    //
-    //     loop_map.insert((pipe.x, pipe.y), pipe.clone());
-    // }
-    //
-    // for y in 0..=max_y {
-    //     for x in 0..=max_x {
-    //         print!(
-    //             "{}",
-    //             match loop_map.get(&(x, y)) {
-    //                 None => '.',
-    //                 Some(pipe) => pipe.char,
-    //             }
-    //         );
-    //     }
-    //     println!();
-    // }
+    let main_loop = main_loop.unwrap();
+    let loop_map: HashMap<_, _> = main_loop
+        .iter()
+        .map(|pipe| ((pipe.x, pipe.y), pipe.clone()))
+        .collect();
 
-    (part_a, 0)
+    let size = source.matches('\n').count() + 2;
+
+    let mut inside = 0;
+
+    for y in 0..=size {
+        let mut north_on = false;
+        let mut south_on = false;
+        for x in 0..=size {
+            match loop_map.get(&(x as isize, y as isize)) {
+                None => {
+                    if north_on && south_on {
+                        inside += 1
+                    };
+                }
+                Some(pipe) => {
+                    if pipe.n {
+                        north_on = !north_on;
+                    };
+                    if pipe.s {
+                        south_on = !south_on;
+                    };
+                }
+            }
+        }
+        println!();
+    }
+
+    (part_a, inside)
 }
 
 fn get_max_pipe_distance(
@@ -280,5 +283,20 @@ SJLL7
 LJ.LJ";
 
         assert_eq!(exec(&sample).0, 8);
+    }
+
+    #[test]
+    fn test_sample_3() {
+        let sample = "...........
+.S-------7.
+.|F-----7|.
+.||.....||.
+.||.....||.
+.|L-7.F-J|.
+.|..|.|..|.
+.L--J.L--J.
+...........";
+
+        assert_eq!(exec(&sample).1, 4);
     }
 }
