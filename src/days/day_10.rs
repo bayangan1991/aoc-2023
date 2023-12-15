@@ -36,15 +36,16 @@ pub fn exec(source: &str) -> (usize, usize) {
         .map(|pipe| ((pipe.x, pipe.y), pipe.clone()))
         .collect();
 
-    let size = source.matches('\n').count() + 2;
+    let size_y = source.matches('\n').count() as isize;
+    let size_x = source.find('\n').unwrap() as isize;
 
     let mut inside = 0;
 
-    for y in 0..=size {
+    for y in 0..=size_y {
         let mut north_on = false;
         let mut south_on = false;
-        for x in 0..=size {
-            match loop_map.get(&(x as isize, y as isize)) {
+        for x in 0..=size_x {
+            match loop_map.get(&(x, y)) {
                 None => {
                     if north_on && south_on {
                         inside += 1
@@ -60,7 +61,6 @@ pub fn exec(source: &str) -> (usize, usize) {
                 }
             }
         }
-        println!();
     }
 
     (part_a, inside)
@@ -194,7 +194,7 @@ mod tests {
             parse_line("F", 0),
             (
                 vec![Pipe {
-                    char: 'x',
+                    char: 'F',
                     start: false,
                     x: 0,
                     y: 0,
